@@ -8,10 +8,8 @@
 !tests/test_*.py
 !patches/
 !patches/*.patch
-!research/
-!research/*.md
 !tools/
-!tools/ptp_probe.py
+!tools/probe_ptp.py
 !.gitattributes
 !docs/
 !docs/*.md
