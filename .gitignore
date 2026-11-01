@@ -11,6 +11,9 @@
 !patches/*.patch
 !tools/
 !tools/probe_ptp.py
+!timing/
+!timing/__init__.py
+!timing/timeline.py
 !.gitattributes
 !docs/
 !docs/*.md

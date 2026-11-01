@@ -25,6 +25,7 @@ the foreground receiver. No startup service or firewall changes are installed.
 - [Playback repairs](docs/playback-fixes.md): measured bugs and fixes.
 - [Multiroom design](docs/multiroom.md): timing limitations, choices and alternatives.
 - [Validation](docs/validation.md): verified results, remaining tests and timing probe usage.
+- [Timing development](docs/timing-development.md): experimental implementation and next steps.
 
 ## Repository layout
 
@@ -36,6 +37,7 @@ the foreground receiver. No startup service or firewall changes are installed.
 | `patches/` | Changes against the pinned upstream commit |
 | `tests/` | Offline playback regressions |
 | `tools/` | Maintained diagnostic commands |
+| `timing/` | Experimental clock and sample timeline; not connected to playback |
 | `docs/` | Setup, implementation and validation guidance |
 
 ## Local workspace
