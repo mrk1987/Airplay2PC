@@ -11,5 +11,15 @@
 !research/
 !research/*.md
 !tools/
-!tools/*.py
+!tools/ptp_probe.py
 !.gitattributes
+!docs/
+!docs/*.md
+
+# Private and generated material stays ignored even inside source folders.
+**/.env
+**/.env.*
+**/*.pem
+**/*.p12
+**/__pycache__/
+**/*.pyc

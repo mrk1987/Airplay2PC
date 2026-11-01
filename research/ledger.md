@@ -1,4 +1,4 @@
-# Evidence ledger — 2026-11-02
+# Evidence ledger â€” 2026-11-02
 
 | ID | Claim | Verdict | Evidence |
 |---|---|---|---|
@@ -8,7 +8,7 @@
 | H4 | goplay2 is a ready Windows alternative | Invalidated | Primary README excludes Windows, ALAC and realtime Spotify. |
 | H5 | Shairport Sync Cygwin supports AirPlay 2 | Invalidated | Official CYGWIN.md explicitly excludes it. |
 | H6 | AirServer Windows supports this exact grouped playback | Insufficient evidence | Connect hardware specification does not establish Windows software capability. |
-| H7 | Windows can observe live group PTP on this LAN | Needs local test | Passive bind/join succeeds; idle 8-second probe saw no packets. Active group not established during probe. |
+| H7 | Windows can observe live group PTP on this LAN | Reachability validated; accuracy unmeasured | 2026-11-02 passive 20-second probe: 142 matched Sync/FollowUp pairs. Supersedes inconclusive idle probe. |
 
 Round 1: Retain receiver after measured padding fix and successful user listening test.
 Defer new timing implementation pending acoustic group test. This follows the user's

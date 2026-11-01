@@ -7,8 +7,8 @@ Cross-room synchronisation and long-run drift are still unverified.
 
 ## Run on this PC
 
-The receiver is currently running as **PC AirPlay**. Do not start a second copy.
-For a later restart, open PowerShell in this directory:
+The receiver advertises as **PC AirPlay**. Check for an existing instance before
+starting another copy. Open PowerShell in this directory:
 
 ```powershell
 .\Start-Airplay.ps1 -ListInterfaces
@@ -40,30 +40,10 @@ may need C/C++ build tools for netifaces; a fresh-machine install has not been t
 The patch includes the previous local audio changes as well as this repair.
 Do not apply it a second time to the current checkout.
 
-## What was repaired
+## Playback repairs
 
-- Strip PyAV alignment padding before audio output. A 352-sample stereo s16 frame
-  has 1,408 valid bytes, but its resampled plane allocates 1,536 bytes. Playing
-  all 1,536 adds 32 unwanted samples per channel every packet: 9.09% excess time
-  plus arbitrary padding noise. Earlier buffered logs also show 4,224 bytes where
-  4,096 are valid. This is a measured bug, not a codec-bit-depth guess.
-- Preserve every decoded/resampled frame, including zero or multiple resampler outputs.
-- Stop reading `48000` as `8000` when parsing the negotiated format.
-- Keep packet, sequence and timestamp queues consistent when removing a packet.
-  Sequence zero now works at rollover; flush preserves order and handles empty queues.
-- Skip stale resends and choose the nearest future sequence after a gap.
-- Configure 24-bit decode with PyAV's s32 container, match mono/stereo output,
-  and use the negotiated ALAC samples per frame.
-- Correct the legacy AES-key/IV selection condition.
-- Route iPhone volume commands to the Windows playback process rather than the
-  network-control process; the latter owns no audio session. Andreas confirmed the slider now controls PC volume.
-- Remove unconditional plaintext and WAV recording from playback. Existing recordings stay local.
-
-Seven regression tests pass, including nonzero stereo ALAC roundtrips for 16/24-bit
-and 352/1024 samples, exact output size/channel order, rate selection across all
-enumerated formats, sequence rollover, out-of-order packets, and empty flush.
-Native startup and mDNS registration succeeded; Andreas confirmed clean sound.
-This does not prove every fix contributed to that improvement.
+See [Playback repairs](docs/PLAYBACK-FIXES.md) for the measured padding bug,
+packet-buffer corrections, volume routing and regression coverage.
 
 ## Multiroom status
 
@@ -72,13 +52,30 @@ implement accurate PTP/NTP sync. `SETRATEANCHORTIME` currently forwards only RTP
 sample time; playback anchors to local message receipt rather than the shared
 network clock. Clean playback does not prove room alignment.
 
-See [research/design.md](research/DESIGN.md) for verified alternatives and test gates.
+See [Design and test gates](research/DESIGN.md) for verified alternatives and test gates.
 `tools/ptp_probe.py` is a passive timing reachability tool, not a clock sync service.
-An eight-second idle probe saw no PTP traffic; that is inconclusive without an active group.
+A 20-second probe on 2026-11-02 received 142 matched Sync/FollowUp pairs.
+This confirms timing traffic is reachable; clock accuracy and room alignment
+remain unmeasured. Acoustic tests are deferred until daytime.
 
-## Local-only material
+## Workspace layout
 
-Pairings, recordings, logs, virtual environments, the old WSL image and exploratory
-scripts are ignored. No pairing keys, device-specific network settings or recorded
-audio are committed. `PROGRESS-2026-11-02.md` is historical and contains superseded
-paths and status. Keep it as evidence; use this README for current operation.
+| Path | Purpose | Tracked |
+|---|---|---|
+| `Start-Airplay.ps1` | Receiver launcher | Yes |
+| `requirements-windows.txt` | Verified dependency versions | Yes |
+| `patches/` | Patch against the pinned upstream commit | Yes |
+| `tests/` | Offline audio and buffer regressions | Yes |
+| `tools/ptp_probe.py` | Passive timing reachability probe | Yes |
+| `docs/` | Playback repair details | Yes |
+| `research/` | Design, evidence ledger and research scope | Yes |
+| `airplay2-receiver/` | Patched upstream checkout | No |
+| `.venv-ap2/`, `analysis-venv/` | Local Python environments | No |
+| `pairings/`, `airplay_capture/` | Private trust data and recordings | No |
+| `scratchpad/` | Historical scripts, notes, logs and WSL image | No |
+| Root `*.log` | Current receiver log paths | No |
+
+The repository uses an explicit file allowlist in `.gitignore`. Add new source
+files deliberately; keep credentials, device settings, recordings and backups
+outside commits. Archived experiments are unsupported and may contain old paths.
+Use this README for current operation.

@@ -1,4 +1,4 @@
-# Current design — 2026-11-02
+# Current design â€” 2026-11-02
 
 Immediate goal: clean single-speaker playback. Andreas confirmed this after the
 padding, format and packet-buffer fixes. Preserve this working baseline.
@@ -30,13 +30,13 @@ Ultimate goal: office PC speakers play in sync with existing AirPlay 2 rooms.
 
 ## Sources (primary)
 
-- https://github.com/openairplay/airplay2-receiver — accurate audio sync explicitly missing.
-- https://github.com/openairplay/goplay2 — Windows excluded; buffered AAC only.
+- https://github.com/openairplay/airplay2-receiver â€” accurate audio sync explicitly missing.
+- https://github.com/openairplay/goplay2 â€” Windows excluded; buffered AAC only.
 - https://raw.githubusercontent.com/openairplay/goplay2/feature/audio-sync/audio/player.go
 - https://raw.githubusercontent.com/openairplay/goplay2/feature/audio-sync/audio/clock.go
-- https://github.com/mikebrady/shairport-sync/blob/master/CYGWIN.md — AirPlay 2 unsupported.
-- https://github.com/mikebrady/nqptp — Linux/FreeBSD PTP timing companion.
-- https://www.airserver.com/WindowsDesktop — Windows multiroom support not established.
+- https://github.com/mikebrady/shairport-sync/blob/master/CYGWIN.md â€” AirPlay 2 unsupported.
+- https://github.com/mikebrady/nqptp â€” Linux/FreeBSD PTP timing companion.
+- https://www.airserver.com/WindowsDesktop â€” Windows multiroom support not established.
 
 Independent research agent found no verified drop-in native Windows alternative
 among these candidates. Local Qwen reviewer identified network-coupled playback
