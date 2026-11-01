@@ -1,0 +1,15 @@
+# Only explicitly reviewed source files are tracked.
+*
+!.gitignore
+!README.md
+!Start-Airplay.ps1
+!requirements-windows.txt
+!tests/
+!tests/test_*.py
+!patches/
+!patches/*.patch
+!research/
+!research/*.md
+!tools/
+!tools/*.py
+!.gitattributes

@@ -1,0 +1,13 @@
+# Versions verified with native CPython 3.12 on Windows.
+netifaces==0.11.0
+zeroconf==0.38.3
+biplist==1.0.3
+pycryptodome==4.2.0
+hexdump==3.3
+srptools==2.0.0
+hkdf==0.0.3
+cryptography==50.0.2
+requests==2.34.2
+av==19.0.2
+PyAudio==0.2.14
+pycaw==20260927; sys_platform == 'win32'
