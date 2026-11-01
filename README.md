@@ -37,7 +37,7 @@ the foreground receiver. No startup service or firewall changes are installed.
 | `patches/` | Changes against the pinned upstream commit |
 | `tests/` | Offline playback regressions |
 | `tools/` | Maintained diagnostic commands |
-| `timing/` | Experimental clock and sample timeline; not connected to playback |
+| `timing/` | Experimental PTP, anchors, clock mapping and scheduling policy; not connected to audio output |
 | `docs/` | Setup, implementation and validation guidance |
 
 ## Local workspace

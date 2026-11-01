@@ -1,46 +1,58 @@
-# Timing implementation progress
+# Experimental timing pipeline
 
-## Implemented: offline clock and sample timeline
+Status on 2026-11-02: ready for captured-data validation, **not connected to audio scheduling**.
+The accepted playback/decode path remains in place. No acoustic success is claimed.
 
-`timing/timeline.py` is experimental and is not imported by receiver playback.
-It provides immutable clock identities (master, domain and reacquisition generation),
-bounded clock mappings, RTP wrap-aware sample anchors, and audio submission deadlines.
-Fraction arithmetic avoids converting large nanosecond epochs to floating point.
-The caller supplies a clock rate, uncertainty budget and actual output latency.
-Invalid, stale, ambiguous or late scheduling requests fail explicitly.
+## Implemented
 
-Eight synthetic tests cover rollover including zero, identity changes, expiry,
-uncertainty, latency deadlines, positive/negative drift, pause, rate changes,
-replacement anchors and malformed inputs. The 30-minute synthetic conversion
-checks arithmetic, not estimated clock accuracy or real audio drift.
+The experimental pipeline uses `perf_counter_ns()` / QueryPerformanceCounter.
+On this Python 3.12 Windows host, `monotonic_ns()` was verified to use
+GetTickCount64 with 15.625 ms resolution; it must not be used or mixed into new
+timing records. QPC reports 100 ns resolution. Capture files identify their clock;
+replay refuses clock fitting on untagged or incompatible records.
 
-No PTP follower, path-delay estimator, protocol anchor parser, scheduler or drift
-controller is implemented yet. A supplied clock mapping is a calibration contract,
-not a claim that raw Sync/FollowUp receipt times meet that contract. The uncertainty
-bound must cover the mapping's entire validity interval, including drift error.
-Clock generations must change after reacquisition even when master ID is unchanged.
-Anchors must be refreshed before their RTP distance becomes ambiguous (half a cycle).
+| Module | Responsibility |
+|---|---|
+| `timing/ptp.py` | PTPv2 header/timestamp validation; bounded Sync/FollowUp pairing; signed correction fields; overflow-sentinel rejection; source/domain/transport isolation |
+| `timing/follower.py` | Selected-source clock fit, warm-up, rate bounds, conservative full-horizon uncertainty, expiry and discontinuity generations |
+| `timing/anchors.py` | Buffered 64-bit fraction conversion; realtime records retain both RTP counters and require explicit latency policy |
+| `timing/timeline.py` | Exact clock/RTP conversions, bounded validity and latency-aware deadlines |
+| `timing/scheduler.py` | Offline scheduling state and bounded, slewed drift-control decisions |
+| `timing/output_clock.py` | Bracketed PortAudio stream-clock to local-monotonic conversion; restart/expiry checks |
+| `timing/diagnostics.py` | Optional private numeric anchor logging, capped per process, disabled by default |
 
-## Next implementation steps
+A packet observation is **not a calibrated master clock**. The follower requires an
+explicit assumed receive-delay ceiling. Its uncertainty includes that ceiling,
+fit residual and full-horizon rate-error allowance. It does not measure path delay,
+elect a master, implement peer awakening or prove Windows receive timestamp quality.
+Reacquisition resets the generation so old anchors cannot be reused silently.
 
-1. Build replayable PTP fixtures and a bounded parser/matcher for Sync/FollowUp,
-   correction fields, source port/domain/sequence and clock changes. Receive timestamps
-   alone cannot establish unbiased master time. Validate against NQPTP behavior;
-   decide and test path-delay handling before claiming accuracy.
-2. Preserve and validate the complete SETRATEANCHORTIME and realtime control anchors.
-   Verify timestamp representation, clock identity and units from protocol evidence.
-3. Feed clock/anchor observations through a diagnostic-only path. Reject stale data;
-   do not change normal playback until that path is validated.
-4. Implement backend output-time measurement, scheduling and gradual drift correction
-   behind an opt-in experimental mode. Test starvation, pause/seek, reconnect and
-   master changes, then perform the daytime acoustic gates in validation.md.
+## Evidence
 
-## Local inference review
+41 offline tests pass, including synthetic 30-minute clock/drift scenarios, packet
+reordering/duplication, sequence rollover, correction arithmetic, malformed frames,
+clock steps/expiry, pause/reanchor behavior, diagnostic redaction and replay.
+Simulation uses declared delay/rate bounds; it is not a real 30-minute listening test.
+Two patch files reproduce the three modified upstream files (allowing CRLF/LF differences).
 
-A local llama-compatible server reviewed the arithmetic for missing boundary tests.
-Its suggestions were checked manually: two alleged issues were contradicted by the
-code/tests. The useful missing case was negative sample distance at half playback
-speed; that case and a slower master clock now have regression coverage. Raw review
-output stays local in `archive/model-review/timing-boundaries.txt`.
+Local Qwen inference supplied bounded boundary-test suggestions; each was manually
+checked. Independent Claude review identified overflow, forward-step lifecycle and
+high-rate-window defects, now covered by regression tests. See the research ledger.
 
-Reference: https://github.com/mikebrady/nqptp
+A silent 20-second probe tonight captured no PTP packets: inconclusive, not a
+regression of earlier active-group reachability. Read-only device enumeration showed
+MME as the default host API with reported 90/180 ms low/high latency; WASAPI is available.
+These latency values are metadata, not measured DAC or acoustic delay. No stream opened.
+
+## Next daytime pilot
+
+1. Launch with `-TimingDiagnostics` to preserve real anchors without changing playback.
+2. Start grouped playback and capture/replay PTP as described in validation.md.
+3. Verify source/master relationship, anchor semantics and receive jitter. In particular,
+   measure the realtime RTP latency policy; do not transplant Shairport's 11025-frame adjustment.
+4. Implement a worker-driven callback backend with actual output clock calibration
+   and continuous resampling. Python fitting, allocation, file writes and locks stay
+   outside the real-time callback. The current drift policy returns decisions only.
+5. Gate opt-in synced output on valid clocks/anchors, then validate acoustically.
+
+The source list and design trade-offs are in [research notes](timing-research/DESIGN.md).

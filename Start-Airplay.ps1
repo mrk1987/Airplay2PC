@@ -2,16 +2,25 @@ param(
     [string]$NetInterface,
     [string]$Name = 'PC AirPlay',
     [switch]$ListInterfaces,
-    [switch]$DebugLogging
+    [switch]$DebugLogging,
+    [switch]$TimingDiagnostics
 )
 $ErrorActionPreference = 'Stop'
 $python = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
 if (-not (Test-Path -LiteralPath $python)) { throw 'Create .venv with Python 3.12 and install requirements-windows.txt first.' }
 $receiver = Join-Path $PSScriptRoot 'vendor/airplay2-receiver/ap2-receiver.py'
+$previousPythonPath = $env:PYTHONPATH
+$previousTimingLog = $env:AIRPLAY_TIMING_LOG_DIR
 $runtime = Join-Path $PSScriptRoot 'runtime'
 New-Item -ItemType Directory -Force -Path $runtime | Out-Null
 Push-Location $runtime
 try {
+    if ($TimingDiagnostics) {
+        $env:PYTHONPATH = if ($previousPythonPath) { $PSScriptRoot + [IO.Path]::PathSeparator + $previousPythonPath } else { $PSScriptRoot }
+        $env:AIRPLAY_TIMING_LOG_DIR = Join-Path $PSScriptRoot 'runtime/timing'
+        & $python -c 'from timing.clock import validate_clock; validate_clock()'
+        if ($LASTEXITCODE -ne 0) { throw 'High-resolution timing clock validation failed.' }
+    }
     if ($ListInterfaces) {
         & $python $receiver --list-interfaces
     } else {
@@ -22,4 +31,8 @@ try {
         & $python @receiverArgs
     }
     if ($LASTEXITCODE -ne 0) { throw "Receiver exited with code $LASTEXITCODE" }
-} finally { Pop-Location }
+} finally {
+    Pop-Location
+    $env:PYTHONPATH = $previousPythonPath
+    $env:AIRPLAY_TIMING_LOG_DIR = $previousTimingLog
+}

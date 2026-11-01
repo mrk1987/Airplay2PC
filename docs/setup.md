@@ -9,6 +9,8 @@ git clone https://github.com/openairplay/airplay2-receiver.git vendor/airplay2-r
 git -C vendor/airplay2-receiver checkout 6c343d3679ddb561c61566985acaaf587d0a3bd3
 git -C vendor/airplay2-receiver apply --check ../../patches/windows-playback.patch
 git -C vendor/airplay2-receiver apply ../../patches/windows-playback.patch
+git -C vendor/airplay2-receiver apply --check ../../patches/timing-diagnostics.patch
+git -C vendor/airplay2-receiver apply ../../patches/timing-diagnostics.patch
 uv venv --python 3.12 .venv
 uv pip install --python .venv/Scripts/python.exe -r requirements-windows.txt
 ```
@@ -33,11 +35,24 @@ pairings under `runtime/pairings/`. Use the launcher to retain pairing trust.
 
 ## Updating the patch
 
-The patch targets the pinned commit above. After an intentional upstream edit,
-regenerate it with `git -C vendor/airplay2-receiver diff --binary` and save the output
-as `patches/windows-playback.patch` without changing its encoding or line endings.
+Both patches target the pinned commit above, applied in the order shown.
+`windows-playback.patch` contains the accepted playback fixes. The second patch
+adds optional anchor logging only; it is inactive unless the launcher enables it.
+Do not apply either patch twice to the existing checkout.
+
+When regenerating patches, first reverse `timing-diagnostics.patch` before exporting
+the playback diff with `git -C vendor/airplay2-receiver diff --binary`. Then reapply
+the diagnostic changes and export only that incremental diff as the second patch.
+Do not fold both into the playback patch and then apply diagnostics a second time.
 Review the patch for private data, run the offline tests, and verify it applies
 to a clean checkout of the pinned commit before committing a replacement.
+
+## Optional timing diagnostics
+
+Add `-TimingDiagnostics` to the normal launcher command to record numeric anchors
+under ignored `runtime/timing/anchors-<pid>.jsonl`. This does not enable synced
+playback or record media, keys or complete protocol payloads. Files stop growing
+at roughly 5 MB per process. The launcher restores its environment variables on exit.
 
 ## Workspace migration on 2026-11-02
 

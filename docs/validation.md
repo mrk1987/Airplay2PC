@@ -30,3 +30,21 @@ The probe receives timing packets and never adjusts the Windows clock. It is
 not a synchronisation service. Do not infer audio alignment from its offsets.
 
 Acoustic testing is deferred until daytime at Andreas' request.
+
+## Capture and replay timing without audio output
+
+While an existing group is active, optionally save a private PTP-only trace:
+
+```powershell
+.\.venv\Scripts\python.exe tools/probe_ptp.py --interface YOUR-LAN-IP --seconds 120 --capture runtime/timing/group.jsonl
+.\.venv\Scripts\python.exe tools/replay_timing.py runtime/timing/group.jsonl
+```
+
+Capture refuses to overwrite existing files. Keep traces local: PTP packets include
+clock identities. The replay opens no sockets or audio hardware. No matched pairs
+returns a nonzero exit status and must not be interpreted as successful validation.
+Fitting additionally requires an explicit source-port identity, master ID and
+`--assumed-max-delay-us`; that delay value is an assumption, not a measurement.
+
+See [Timing development](timing-development.md) for the current implementation and
+remaining backend, delay-measurement and acoustic gates.
