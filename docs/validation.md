@@ -23,7 +23,7 @@ It establishes PTP traffic reachability, not clock accuracy or acoustic alignmen
 When daytime testing resumes, start grouped playback before running:
 
 ```powershell
-.\.venv-ap2\Scripts\python.exe tools/probe_ptp.py --interface YOUR-LAN-IP --seconds 20
+.\.venv\Scripts\python.exe tools/probe_ptp.py --interface YOUR-LAN-IP --seconds 20
 ```
 
 The probe receives timing packets and never adjusts the Windows clock. It is

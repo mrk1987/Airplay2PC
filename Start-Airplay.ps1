@@ -5,10 +5,12 @@ param(
     [switch]$DebugLogging
 )
 $ErrorActionPreference = 'Stop'
-$python = Join-Path $PSScriptRoot '.venv-ap2/Scripts/python.exe'
-if (-not (Test-Path -LiteralPath $python)) { throw 'Create .venv-ap2 with Python 3.12 and install requirements-windows.txt first.' }
-$receiver = Join-Path $PSScriptRoot 'airplay2-receiver/ap2-receiver.py'
-Push-Location $PSScriptRoot
+$python = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
+if (-not (Test-Path -LiteralPath $python)) { throw 'Create .venv with Python 3.12 and install requirements-windows.txt first.' }
+$receiver = Join-Path $PSScriptRoot 'vendor/airplay2-receiver/ap2-receiver.py'
+$runtime = Join-Path $PSScriptRoot 'runtime'
+New-Item -ItemType Directory -Force -Path $runtime | Out-Null
+Push-Location $runtime
 try {
     if ($ListInterfaces) {
         & $python $receiver --list-interfaces

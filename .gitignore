@@ -3,6 +3,7 @@
 !.gitignore
 !README.md
 !Start-Airplay.ps1
+!Test-Airplay.ps1
 !requirements-windows.txt
 !tests/
 !tests/test_*.py

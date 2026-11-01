@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import unittest
 from types import SimpleNamespace
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'airplay2-receiver'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'vendor' / 'airplay2-receiver'))
 import av
 from ap2.connections.audio import Audio, AirplayAudFmt, RTPRealtimeBuffer
 
