@@ -1,0 +1,4 @@
+-r requirements-windows.txt
+pystray==0.19.5
+pillow==13.0.0
+psutil==7.2.2

@@ -10,6 +10,11 @@
 !assets/icons/airplay-audio-white.ico
 !assets/icons/README.md
 !Start-Airplay.ps1
+!Start-Tray.ps1
+!Install-Tray.ps1
+!requirements-tray.txt
+!tray_app/
+!tray_app/*.py
 !Test-Airplay.ps1
 !requirements-windows.txt
 !tests/

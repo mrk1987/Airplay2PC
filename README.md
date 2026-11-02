@@ -7,6 +7,10 @@ Multiroom alignment and long-run drift remain unmeasured.
 
 ## Run
 
+For tray controls with the white AirPlay icon, install `requirements-tray.txt`
+and run `.\Start-Tray.ps1`. See [Tray app](docs/tray-app.md) for installation,
+Start/Stop/Restart, settings, login startup and process cleanup.
+
 Check for an existing **PC AirPlay** instance before starting another copy.
 From PowerShell in this directory:
 
@@ -32,11 +36,13 @@ the foreground receiver. No startup service or firewall changes are installed.
 | Path | Contents |
 |---|---|
 | `Start-Airplay.ps1` | Windows receiver launcher |
+| `Start-Tray.ps1`, `Install-Tray.ps1` | Tray launcher and per-user Start menu shortcut |
 | `Test-Airplay.ps1` | Offline regression runner |
 | `requirements-windows.txt` | Verified Python dependency versions |
 | `patches/` | Changes against the pinned upstream commit |
 | `tests/` | Offline playback regressions |
 | `tools/` | Maintained diagnostic commands |
+| `tray_app/` | Native Windows tray UI and receiver process supervision |
 | `timing/` | Experimental PTP, anchors, clock mapping and scheduling policy; not connected to audio output |
 | `docs/` | Setup, implementation and validation guidance |
 
