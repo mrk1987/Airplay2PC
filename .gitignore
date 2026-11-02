@@ -2,6 +2,13 @@
 *
 !.gitignore
 !README.md
+!assets/
+!assets/icons/
+!assets/icons/airplay-audio.png
+!assets/icons/airplay-audio.ico
+!assets/icons/airplay-audio-white.png
+!assets/icons/airplay-audio-white.ico
+!assets/icons/README.md
 !Start-Airplay.ps1
 !Test-Airplay.ps1
 !requirements-windows.txt
