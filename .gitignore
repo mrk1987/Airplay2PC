@@ -4,10 +4,12 @@
 !README.md
 !assets/
 !assets/icons/
-!assets/icons/airplay-audio.png
-!assets/icons/airplay-audio.ico
-!assets/icons/airplay-audio-white.png
-!assets/icons/airplay-audio-white.ico
+!assets/icons/Airplay2PC-logo.png
+!assets/icons/Airplay2PC-logo.ico
+!assets/icons/Airplay2PC-icon.png
+!assets/icons/Airplay2PC-icon.ico
+!assets/banner.png
+!assets/banner-prompt.md
 !assets/icons/README.md
 !Start-Airplay.ps1
 !Start-Tray.ps1
@@ -40,6 +42,19 @@
 !.gitattributes
 !docs/
 !docs/*.md
+!LICENSE
+!THIRD_PARTY.md
+!CHANGELOG.md
+!SECURITY.md
+!VERSION
+!requirements-release.txt
+!packaging/
+!packaging/*.py
+!packaging/*.ps1
+!packaging/*.cmd
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
 
 # Private and generated material stays ignored even inside source folders.
 **/.env

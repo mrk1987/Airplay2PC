@@ -1,11 +1,14 @@
 # Windows tray app
 
-Airplay2PC runs in the signed-in user's session. The white AirPlay icon manages
-the receiver; no machine-wide Windows Service or administrator installation is needed.
-Settings windows use an explicit Airplay2PC taskbar identity, high-resolution PNG
-icons and per-monitor DPI awareness, rather than Python's grouped taskbar icon.
+Airplay2PC runs in your Windows session. The tray icon controls the receiver,
+and Settings has its own taskbar icon. There's no Windows service to install
+and no administrator access required.
 
 ## Install and run
+
+The [release installer](https://github.com/mrk1987/Airplay2PC/releases/latest)
+handles setup and opens Settings. For a development checkout, first follow
+[Setup](setup.md), then run:
 
 ```powershell
 uv pip install --python .venv/Scripts/python.exe -r requirements-tray.txt
@@ -67,9 +70,10 @@ mutexes, cooperative shutdown and settings validation. Actual receiver Start,
 Restart and Stop were also checked without sending audio.
 
 The UI uses Windows native menus and ttk system controls, keyboard focus, text
-status and labelled settings. Automated screenshot/interaction verification was
-unavailable during implementation because the Computer Use native pipe was offline;
-do not treat this as a completed visual acceptance test.
+status and labelled settings. I haven't completed an automated screenshot and
+interaction test of the UI.
 
-To remove: quit the tray, disable Start at login in Settings, then remove its
-Start menu shortcut. Local pairings and recordings are not removed.
+For an installed release, quit the tray and remove Airplay2PC through Windows'
+installed-apps list. Pairings, settings and logs stay in `runtime/`.
+For a development checkout, quit the tray, disable Start at login in Settings,
+then remove its Start menu shortcut.

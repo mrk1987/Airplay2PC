@@ -1,7 +1,8 @@
 # Experimental timing pipeline
 
-Status on 2026-11-02: ready for captured-data validation, **not connected to audio scheduling**.
-The accepted playback/decode path remains in place. No acoustic success is claimed.
+As of 2026-11-02, the timing code is ready to test against captured data but
+isn't connected to audio scheduling. Playback still uses the existing receiver.
+It sounds in sync in my setup; I haven't measured the acoustic alignment.
 
 ## Implemented
 
@@ -33,18 +34,18 @@ Reacquisition resets the generation so old anchors cannot be reused silently.
 reordering/duplication, sequence rollover, correction arithmetic, malformed frames,
 clock steps/expiry, pause/reanchor behavior, diagnostic redaction and replay.
 Simulation uses declared delay/rate bounds; it is not a real 30-minute listening test.
-Two patch files reproduce the three modified upstream files (allowing CRLF/LF differences).
+The initial two patches reproduced the three modified upstream files (allowing
+CRLF/LF differences). The 0.1 release adds fixed-delay and discovery-cleanup patches.
 
-Local Qwen inference supplied bounded boundary-test suggestions; each was manually
-checked. Independent Claude review identified overflow, forward-step lifecycle and
-high-rate-window defects, now covered by regression tests. See the research ledger.
+Review found overflow, forward-step lifecycle and high-rate-window bugs.
+They're fixed and covered by regression tests. See the research ledger.
 
 A silent 20-second probe tonight captured no PTP packets: inconclusive, not a
 regression of earlier active-group reachability. Read-only device enumeration showed
 MME as the default host API with reported 90/180 ms low/high latency; WASAPI is available.
 These latency values are metadata, not measured DAC or acoustic delay. No stream opened.
 
-## Next daytime pilot
+## Next tests
 
 1. Launch with `-TimingDiagnostics` to preserve real anchors without changing playback.
 2. Start grouped playback and capture/replay PTP as described in validation.md.

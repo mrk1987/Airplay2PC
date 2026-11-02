@@ -1,15 +1,15 @@
 # Multiroom design
 
-Goal: receive iPhone audio on native Windows PC speakers alongside existing
-AirPlay 2 rooms, with stable playback and measured synchronisation. Preserve
-the accepted clean playback and remote volume baseline.
+I want my Windows PC speakers to play alongside my other AirPlay 2 speakers.
+It now sounds in sync to me, with clean playback and working iPhone volume
+control. I haven't measured the acoustic offset or long-run drift.
 
 ## Current limitation
 
 The receiver advertises and accepts AirPlay 2 streams, but does not implement
 accurate shared-clock playback. `SETRATEANCHORTIME` forwards only RTP sample
 time; playback anchors to local message receipt rather than the network clock.
-Clean sound and reachable PTP traffic do not establish room alignment.
+My listening test is encouraging, but it doesn't establish clock accuracy.
 
 Measure acoustic alignment and long-run drift before changing the timing code.
 See [Validation](validation.md) for acceptance targets and test commands.
@@ -32,8 +32,8 @@ virtual PTP clock, and schedule against actual DAC output time. Add controlled
 drift correction only with clock tests and acoustic measurements. Changing
 the Windows system clock is unnecessary.
 
-Do not remove startup buffering or rewrite pacing based on speculative review
-comments. Those changes have not been shown to improve the accepted baseline.
+I'm keeping the working buffering and pacing unless a listening test or
+measurement shows a problem worth fixing.
 
 ## Alternatives examined on 2026-11-02
 
@@ -51,7 +51,6 @@ The comparisons below are historical findings, not newly checked support claims.
 
 ## Scope
 
-Native Windows is preferred. Earlier local investigation reported firmware
-virtualisation disabled, so WSL2 was not a working route. No purchases or
-machine-wide installation are part of the current implementation. Pairing
-trust and private recordings must remain local.
+I'm keeping this native to Windows. WSL2 wasn't a working option on the test
+machine because firmware virtualisation was disabled. The current setup needs
+no purchases or machine-wide installation. Pairings and recordings stay local.

@@ -1,4 +1,4 @@
-# Timing evidence ledger â€” 2026-11-02
+# Timing evidence ledger - 2026-11-02
 
 | ID | Claim | Verdict | Evidence |
 |---|---|---|---|
@@ -14,10 +14,10 @@
 
 ## Rounds
 
-1. Primary-code research plus independent Codex/Claude inspection corrected fraction width, RTP latency assumptions and path-delay claims.
-2. Implemented packet/anchor/follower modules and synthetic replay. Claude found reserved correction sentinel, forward steps, high-rate window and weak sequence test; verified and fixed. Local Qwen supplied malformed-packet cases; several were already tested and were not counted as new findings.
+1. I checked the reference implementations and corrected the fraction width, RTP latency assumptions and path-delay claims.
+2. Implemented packet/anchor/follower modules and synthetic replay. Review found bugs around the reserved correction sentinel, forward steps and high-rate window, plus a weak sequence test. These are fixed. I also checked malformed-packet cases against the existing tests.
 3. Added bounded scheduler/drift decisions, PortAudio clock bridge and opt-in numeric anchor diagnostics. Silent probe was inconclusive; no audio stream opened. Added replay, redaction, IO-failure and output-clock tests.
-4. Final independent attack identified the Windows clock-resolution blocker. Verified it live and switched experimental timestamps to QPC with clock-domain guards. Independent review also found malformed JSONL input shapes; fixed and tested. All prior lifecycle/correction findings confirmed addressed. Reproducibility checks passed ignoring LF/CRLF translation. Remaining hardware/sender uncertainties stay explicit; code defects found by the verifier are addressed before commit. No acoustic acceptance implied.
+4. The last review found the Windows clock-resolution problem. Verified it live and switched experimental timestamps to QPC with clock-domain guards. Independent review also found malformed JSONL input shapes; fixed and tested. All prior lifecycle/correction findings confirmed addressed. Reproducibility checks passed ignoring LF/CRLF translation. Sender and hardware measurements are still needed. These tests do not establish acoustic alignment.
 
 ## Primary sources
 

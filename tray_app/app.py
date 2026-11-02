@@ -28,7 +28,7 @@ class App:
         self.root = tk.Tk()
         self.root.withdraw()
         self.root.title('Airplay2PC')
-        with Image.open(ROOT/'assets/icons/airplay-audio-white.png') as source:
+        with Image.open(ROOT/'assets/icons/Airplay2PC-logo.png') as source:
             self.window_icons = [ImageTk.PhotoImage(source.resize((size,size),Image.Resampling.LANCZOS), master=self.root)
                                  for size in (256,128,64,48,32,24,16)]
         self.root.iconphoto(True, *self.window_icons)
@@ -44,7 +44,7 @@ class App:
             logging.exception('Cannot load tray settings')
             self.config = dict(name='PC AirPlay', interface='', diagnostics=False, output_delay_ms=0)
             self.root.after(300, lambda error=str(exc): messagebox.showerror('Airplay2PC settings', error, parent=self.root))
-        self.icon = pystray.Icon('Airplay2PC', Image.open(ROOT/'assets/icons/airplay-audio-white.png'),
+        self.icon = pystray.Icon('Airplay2PC', Image.open(ROOT/'assets/icons/Airplay2PC-icon.png'),
                                 'Airplay2PC — Stopped', self.menu())
         threading.Thread(target=self.icon.run, daemon=True).start()
         self.root.after(200, self.tick)

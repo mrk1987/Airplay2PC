@@ -1,0 +1,44 @@
+name: Windows checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m venv .venv
+          .venv/Scripts/python.exe -m pip install -r requirements-tray.txt
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Fetch and patch pinned receiver
+        shell: pwsh
+        run: |
+          git clone https://github.com/openairplay/airplay2-receiver.git vendor/airplay2-receiver
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          git -C vendor/airplay2-receiver checkout 6c343d3679ddb561c61566985acaaf587d0a3bd3
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          .venv/Scripts/python.exe packaging/apply_patches.py vendor/airplay2-receiver patches/windows-playback.patch patches/timing-diagnostics.patch patches/output-delay.patch patches/network-discovery.patch
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Run regressions
+        shell: pwsh
+        run: ./Test-Airplay.ps1
+      - name: Parse setup scripts
+        shell: pwsh
+        run: |
+          Get-ChildItem packaging/*.ps1 | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors) { throw ($errors | Out-String) }
+          }

@@ -13,7 +13,7 @@
 ## Gates in order
 
 1. Offline regressions: 41/41 pass, no network/audio device required.
-2. Reproducibility: both patches apply in order to pinned upstream; all three edited files match ignoring line-ending translation.
+2. Reproducibility: the original two timing/playback patches apply in order to pinned upstream; all three edited files match ignoring line-ending translation. Release setup also applies the later fixed-delay and discovery-cleanup patches.
 3. Captured-data pilot: at least 120 seconds of active-group PTP and anchor data; zero source/domain cross-matches; every usable buffered anchor preserves its uint64 clock ID and fraction. Report invalid/unmatched counts explicitly.
 4. Host calibration: establish actual receive-delay/stream-clock error budgets. Mapping uncertainty must fit a 5 ms diagnostic budget across its full horizon; assumed bounds do not count as measurements.
 5. Experimental backend: callback timestamp discontinuities, stale anchors and starvation fail closed; 30-minute instrumented output run with zero underruns and no uncontrolled sample drops/repeats. Audio backend/resampler not implemented yet.

@@ -12,7 +12,7 @@ if ((Test-Path -LiteralPath $path) -and $shortcut.TargetPath -and $shortcut.Targ
 $shortcut.TargetPath = $python
 $shortcut.Arguments = '"' + $app + '"'
 $shortcut.WorkingDirectory = $PSScriptRoot
-$shortcut.IconLocation = (Join-Path $PSScriptRoot 'assets/icons/airplay-audio-white.ico') + ',0'
+$shortcut.IconLocation = (Join-Path $PSScriptRoot 'assets/icons/Airplay2PC-logo.ico') + ',0'
 $shortcut.Description = 'AirPlay receiver controls and settings'
 $shortcut.WindowStyle = 7
 $shortcut.Save()

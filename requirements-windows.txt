@@ -1,6 +1,6 @@
 # Versions verified with native CPython 3.12 on Windows.
 netifaces==0.11.0
-zeroconf==0.38.3
+zeroconf==0.149.16
 biplist==1.0.3
 pycryptodome==4.2.0
 hexdump==3.3

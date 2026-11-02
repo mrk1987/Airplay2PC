@@ -1,15 +1,33 @@
+![Airplay2PC - AirPlay audio on Windows](assets/banner.png)
+
 # Airplay2PC
 
-Native Windows AirPlay 2 audio receiver based on a pinned
-`openairplay/airplay2-receiver` checkout and a maintained local patch.
-Andreas confirmed clean playback and iPhone volume control on 2026-11-02.
-Multiroom alignment and long-run drift remain unmeasured.
+An AirPlay 2 audio receiver for Windows, built on
+[openairplay/airplay2-receiver](https://github.com/openairplay/airplay2-receiver)
+with playback fixes and a Windows tray app.
+
+I wanted to use my PC speakers alongside my other AirPlay speakers. Playback
+is clean, volume works from the iPhone, and sync sounds spot on to my ear in
+my setup. I've tested it with Spotify set to lossless streaming. I haven't
+measured the alignment in milliseconds or checked long-run drift yet.
+
+This repo contains the patches, launchers, tray app and tests.
 
 ## Run
 
-For tray controls with the white AirPlay icon, install `requirements-tray.txt`
-and run `.\Start-Tray.ps1`. See [Tray app](docs/tray-app.md) for installation,
-Start/Stop/Restart, settings, login startup and process cleanup.
+Download **Airplay2PC-0.1.0-Setup.exe** from [Releases](https://github.com/mrk1987/Airplay2PC/releases/latest)
+and run it on Windows x64. Setup needs an internet connection. It installs
+for your account, downloads Python and the receiver, and opens Settings.
+Choose your physical LAN interface, then start the receiver.
+
+The installer is unsigned, so Windows may show an unknown-publisher warning.
+The release includes SHA-256 checksums. No administrator access is required.
+If Windows asks about the firewall, allow Python on your private network.
+
+The tray lets you start, stop and restart the receiver,
+choose a network interface, set an output delay and enable startup at login.
+See [Tray app](docs/tray-app.md) for details. For a source checkout, follow
+[Setup](docs/setup.md), then run `.\Start-Tray.ps1`.
 
 Check for an existing **PC AirPlay** instance before starting another copy.
 From PowerShell in this directory:
@@ -30,6 +48,16 @@ the foreground receiver. No startup service or firewall changes are installed.
 - [Multiroom design](docs/multiroom.md): timing limitations, choices and alternatives.
 - [Validation](docs/validation.md): verified results, remaining tests and timing probe usage.
 - [Timing development](docs/timing-development.md): experimental implementation and next steps.
+- [Building a release](docs/release.md): installer, source package and uninstall.
+
+## Licence
+
+My original code is [MIT licensed](LICENSE). Use it, change it, share it.
+The upstream receiver has no licence file and is downloaded separately during
+setup. Third-party code, patch context and trademarks aren't covered by
+my licence. See [Third-party notes](THIRD_PARTY.md).
+
+This is an independent project, not an Apple or Spotify product.
 
 ## Repository layout
 
@@ -48,7 +76,7 @@ the foreground receiver. No startup service or firewall changes are installed.
 
 ## Local workspace
 
-These paths are ignored and retain private data or machine-local dependencies:
+Dependencies, settings, logs and recordings stay local and out of Git:
 
 | Path | Contents |
 |---|---|
@@ -65,8 +93,6 @@ The launcher resolves source and interpreter paths from the project root, then
 runs in `runtime/` so generated files stay together. Always use the launcher:
 upstream resolves pairing storage relative to its working directory.
 
-New disposable experiments belong in `archive/`; maintained diagnostics belong
-in `tools/`. Retired environments can contain absolute paths and should be
-recreated before reuse. Only deliberately reviewed files are allowed through
-`.gitignore`. Keep credentials, recordings and device settings local. `.git/`
-is repository metadata and stays at the root.
+I keep old experiments in `archive/` and reusable diagnostics in `tools/`.
+Recreate old Python environments rather than reusing them; they can contain
+absolute paths. Keep credentials, recordings and device settings out of commits.

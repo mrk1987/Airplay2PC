@@ -1,0 +1,11 @@
+--- a/ap2-receiver.py
++++ b/ap2-receiver.py
+@@ -1225,7 +1225,7 @@
+ 
+ def unregister_mdns(zeroconf, info):
+     try:
+-        asyncio.run(zeroconf.async_unregister_service(info))
++        zeroconf.unregister_service(info)
+         SCR_LOG.info("mDNS: Unregistering")
+     except (NonUniqueNameException) as e:
+         # Observed NonUniqueNameException once during testing

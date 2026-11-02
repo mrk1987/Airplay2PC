@@ -1,3 +1,10 @@
 *.md text eol=lf
+*.py text eol=lf
+*.ps1 text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf
+*.cmd text eol=crlf
+LICENSE text eol=lf
+VERSION text eol=lf
 .gitignore text eol=lf
 *.patch -text -whitespace

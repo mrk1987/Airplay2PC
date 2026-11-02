@@ -1,9 +1,14 @@
-# Tray icon assets
+# Airplay2PC artwork
 
-User-selected source:
-https://brandlogos.net/wp-content/uploads/2022/08/airplay_audio-logo_brandlogos.net_tzwqh-512x512.png
+The logo and monochrome tray icon were supplied by Andreas for this project.
+The original PNG files are kept unchanged.
 
-`airplay-audio.png` is the original 512px transparent image.
-`airplay-audio-white.png` uses white RGB with the original alpha mask unchanged.
-The `.ico` files include 16, 20, 24, 32, 48, 64, 128 and 256px sizes.
-The white variant is used by the tray app and its Start menu shortcut.
+- `Airplay2PC-logo.png`: coloured logo for the README banner and application identity.
+- `Airplay2PC-icon.png`: white icon for the notification area.
+- The matching `.ico` files contain 16, 20, 24, 32, 48, 64, 128 and 256 px sizes.
+- The coloured ICO is used for the installer, Start menu shortcut and installed-apps entry.
+- Settings windows use the coloured PNG; the tray uses the white PNG.
+
+The previous third-party AirPlay icons are no longer used. Historical copies
+are excluded from this project's MIT licence. Product trademarks retain their
+owners' rights; see `THIRD_PARTY.md` at the repository root.
