@@ -51,9 +51,12 @@ if ($Target) { $link.TargetPath=$Target; $link.Arguments='"'+$App+'"'; $link.Sav
             result = self.invoke(helper, '-Path', link)
             self.assertEqual(result.returncode, 0, result.stderr)
             value = json.loads(result.stdout)
-            self.assertEqual(Path(value['target']), app / '.venv/Scripts/pythonw.exe')
-            self.assertEqual(value['arguments'], '"' + str(app / 'tray_app/app.py') + '"')
-            self.assertEqual(value['icon'], str(app / 'assets/icons/Airplay2PC-logo.ico') + ',0')
+            self.assertTrue(os.path.samefile(value['target'], app / '.venv/Scripts/pythonw.exe'))
+            self.assertTrue(value['arguments'].startswith('"') and value['arguments'].endswith('"'))
+            self.assertTrue(os.path.samefile(value['arguments'][1:-1], app / 'tray_app/app.py'))
+            icon_path, icon_index = value['icon'].rsplit(',', 1)
+            self.assertEqual(icon_index, '0')
+            self.assertTrue(os.path.samefile(icon_path, app / 'assets/icons/Airplay2PC-logo.ico'))
 
     def test_unrelated_shortcut_is_preserved(self):
         with tempfile.TemporaryDirectory() as folder:
