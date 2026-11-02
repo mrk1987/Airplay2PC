@@ -42,7 +42,7 @@ class App:
             self.config = settings.load()
         except (ValueError, OSError) as exc:
             logging.exception('Cannot load tray settings')
-            self.config = dict(name='PC AirPlay', interface='', diagnostics=False)
+            self.config = dict(name='PC AirPlay', interface='', diagnostics=False, output_delay_ms=0)
             self.root.after(300, lambda error=str(exc): messagebox.showerror('Airplay2PC settings', error, parent=self.root))
         self.icon = pystray.Icon('Airplay2PC', Image.open(ROOT/'assets/icons/airplay-audio-white.png'),
                                 'Airplay2PC — Stopped', self.menu())
@@ -170,6 +170,7 @@ class App:
         name = tk.StringVar(value=self.config['name'])
         selected = tk.StringVar()
         diagnostics = tk.BooleanVar(value=self.config['diagnostics'])
+        delay = tk.StringVar(value=str(self.config['output_delay_ms']))
         startup = tk.BooleanVar(value=settings.startup_enabled())
         ttk.Label(frame, text='Receiver name').grid(row=0, column=0, sticky='w')
         entry = ttk.Entry(frame, textvariable=name, width=52)
@@ -187,17 +188,20 @@ class App:
         combo = ttk.Combobox(frame, textvariable=selected, values=list(choices), state='readonly', width=65)
         combo.grid(row=3, column=0, sticky='ew', pady=(4,6))
         ttk.Label(frame, text='Choose your home LAN. Avoid VPN and virtual adapters.', wraplength=460).grid(row=4, column=0, sticky='w', pady=(0,16))
-        ttk.Checkbutton(frame, text='Record timing diagnostics', variable=diagnostics).grid(row=5, column=0, sticky='w')
-        ttk.Checkbutton(frame, text='Start receiver at Windows login', variable=startup).grid(row=6, column=0, sticky='w', pady=(8,16))
-        ttk.Label(frame, text='Changes apply the next time the receiver starts.\nReady does not mean multiroom sync is verified.', wraplength=460).grid(row=7, column=0, sticky='w', pady=(0,18))
+        ttk.Label(frame, text='Output delay (ms)').grid(row=5, column=0, sticky='w')
+        ttk.Spinbox(frame, from_=0, to=2000, increment=10, textvariable=delay, width=10).grid(row=6, column=0, sticky='w', pady=(4,6))
+        ttk.Label(frame, text='0–2000 ms. Higher values play later. 0 adds no delay.', wraplength=460).grid(row=7, column=0, sticky='w', pady=(0,16))
+        ttk.Checkbutton(frame, text='Record timing diagnostics', variable=diagnostics).grid(row=8, column=0, sticky='w')
+        ttk.Checkbutton(frame, text='Start receiver at Windows login', variable=startup).grid(row=9, column=0, sticky='w', pady=(8,16))
+        ttk.Label(frame, text='Changes apply the next time the receiver starts.\nA fixed delay does not correct clock drift.', wraplength=460).grid(row=10, column=0, sticky='w', pady=(0,18))
         buttons = ttk.Frame(frame)
-        buttons.grid(row=8, column=0, sticky='e')
+        buttons.grid(row=11, column=0, sticky='e')
 
         def apply():
             try:
                 if selected.get() not in choices:
                     raise ValueError('Choose an available LAN interface.')
-                updated = settings.validate(dict(name=name.get(), interface=choices[selected.get()], diagnostics=diagnostics.get()))
+                updated = settings.validate(dict(name=name.get(), interface=choices[selected.get()], diagnostics=diagnostics.get(), output_delay_ms=int(delay.get())))
                 settings.set_startup(startup.get())
                 settings.save(updated)
                 self.config = updated

@@ -11,6 +11,8 @@ git -C vendor/airplay2-receiver apply --check ../../patches/windows-playback.pat
 git -C vendor/airplay2-receiver apply ../../patches/windows-playback.patch
 git -C vendor/airplay2-receiver apply --check ../../patches/timing-diagnostics.patch
 git -C vendor/airplay2-receiver apply ../../patches/timing-diagnostics.patch
+git -C vendor/airplay2-receiver apply --check ../../patches/output-delay.patch
+git -C vendor/airplay2-receiver apply ../../patches/output-delay.patch
 uv venv --python 3.12 .venv
 uv pip install --python .venv/Scripts/python.exe -r requirements-windows.txt
 ```
@@ -35,12 +37,14 @@ pairings under `runtime/pairings/`. Use the launcher to retain pairing trust.
 
 ## Updating the patch
 
-Both patches target the pinned commit above, applied in the order shown.
+All three patches target the pinned commit above, applied in the order shown.
 `windows-playback.patch` contains the accepted playback fixes. The second patch
 adds optional anchor logging only; it is inactive unless the launcher enables it.
-Do not apply either patch twice to the existing checkout.
+`output-delay.patch` adds the optional fixed PCM delay and is inactive at the
+default 0 ms. Do not apply any patch twice to the existing checkout.
 
-When regenerating patches, first reverse `timing-diagnostics.patch` before exporting
+When regenerating patches, first reverse `output-delay.patch`, then reverse
+`timing-diagnostics.patch` before exporting
 the playback diff with `git -C vendor/airplay2-receiver diff --binary`. Then reapply
 the diagnostic changes and export only that incremental diff as the second patch.
 Do not fold both into the playback patch and then apply diagnostics a second time.

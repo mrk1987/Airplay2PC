@@ -25,8 +25,15 @@ stored locally in ignored `runtime/tray-settings.json`.
 - **Stopped / Starting / Ready / Stopping / Failed:** shown as menu text and tooltip.
   Ready means the owned receiver socket is listening, not that audio is playing
   or multiroom synchronisation has been verified.
-- **Settings:** receiver name, LAN interface, diagnostics and login startup.
+- **Settings:** receiver name, LAN interface, output delay, diagnostics and login startup.
   Changes apply at the next receiver start.
+- **Output delay:** 0–2000 ms, in whole milliseconds; positive means later.
+  A fixed PCM delay line preserves byte counts and playback speed. Zero is an
+  exact pass-through. Restart to apply; pause/flush discards the retained tail
+  so old audio is not replayed. The final delayed tail is discarded on Stop.
+  Negative values are not offered: advancing playback requires controlled removal
+  of existing buffering or shared-clock scheduling. This setting does not fix drift.
+  The foreground launcher also accepts `-OutputDelayMs`.
 - **Open logs:** opens `runtime/`; `receiver.log` is receiver output and `tray.log`
   is the rotating app log. These can contain private protocol/device metadata.
 - **Timing diagnostics:** records numeric anchors after the next restart. It

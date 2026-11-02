@@ -1,0 +1,49 @@
+--- a/ap2/connections/audio.py
++++ b/ap2/connections/audio.py
+@@ -1,4 +1,5 @@
+ import socket
++import os
+ import multiprocessing
+ import enum
+ import threading
+@@ -605,7 +606,14 @@
+                         # belong on the audio device; padding adds time and noise.
+                         size = frame.samples * len(frame.layout.channels) * frame.format.bytes
+                         chunks.append(bytes(frame.planes[0])[:size])
+-                return b''.join(chunks)
++                pcm = b''.join(chunks)
++                delay_ms = int(os.environ.get('AIRPLAY2PC_OUTPUT_DELAY_MS', '0'))
++                if delay_ms:
++                    from timing.output_delay import PcmDelay
++                    if getattr(self, '_output_delay', None) is None:
++                        self._output_delay = PcmDelay(delay_ms, self.sample_rate, self.channel_count)
++                    pcm = self._output_delay.process(pcm)
++                return pcm
+             except ValueError as e:
+                 self.audio_screen_logger.error(repr(e))
+ 
+@@ -763,8 +771,11 @@
+                     if str.startswith(message, "flush_seq_rtptime"):
+                         flush_seq, self.anchorRTPTimestamp = map(int, str.split(message, "-")[-2:])
+                         self.rtp_buffer.flush(flush_seq)
++                        self._output_delay = None
+                         starting = True
+                         playing = False
++                    elif message == "pause":
++                        self._output_delay = None
+                     elif str.startswith(message, "progress"):
+                         startTS, currentTS, stopTS = map(int, str.split(message, "-")[-1:][0].split('/'))
+ 
+@@ -913,10 +924,12 @@
+                             playing = True
+ 
+                         elif message == "pause":
++                            self._output_delay = None
+                             playing = False
+                             buffer_ready = False
+ 
+                         elif str.startswith(message, "flush_from_until_seq"):
++                            self._output_delay = None
+                             flush_from, flush_to = map(int, str.split(message, "-")[-2:])
+                             serverconn.send(message)
+                             playing = False

@@ -31,20 +31,23 @@ def validate(settings):
     name = settings.get('name', 'PC AirPlay')
     interface = settings.get('interface', '')
     diagnostics = settings.get('diagnostics', False)
+    delay = settings.get('output_delay_ms', 0)
     if not isinstance(name, str) or not name.strip() or len(name) > 63 or any(ord(ch) < 32 for ch in name):
         raise ValueError('Receiver name must contain 1–63 printable characters.')
     if not isinstance(interface, str) or len(interface) > 128:
         raise ValueError('Invalid network interface.')
     if type(diagnostics) is not bool:
         raise ValueError('Invalid diagnostics setting.')
-    return dict(name=name.strip(), interface=interface, diagnostics=diagnostics)
+    if type(delay) is not int or not 0 <= delay <= 2000:
+        raise ValueError('Output delay must be a whole number from 0 to 2000 ms.')
+    return dict(name=name.strip(), interface=interface, diagnostics=diagnostics, output_delay_ms=delay)
 
 
 def load():
     if CONFIG.exists():
         return validate(json.loads(CONFIG.read_text(encoding='utf-8')))
     candidates = [guid for guid, _, private in interfaces() if private]
-    return dict(name='PC AirPlay', interface=candidates[0] if len(candidates) == 1 else '', diagnostics=False)
+    return dict(name='PC AirPlay', interface=candidates[0] if len(candidates) == 1 else '', diagnostics=False, output_delay_ms=0)
 
 
 def save(settings):

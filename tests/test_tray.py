@@ -116,14 +116,21 @@ class WindowsLifecycleTests(unittest.TestCase):
 
 
 class TraySettingsTests(unittest.TestCase):
+    def test_delay_bounds_and_legacy_default(self):
+        base = dict(name='PC AirPlay', interface='{test}', diagnostics=False)
+        self.assertEqual(settings.validate(base)['output_delay_ms'],0)
+        for delay in (-1,2001,1.5,True):
+            with self.assertRaises(ValueError):settings.validate(dict(base,output_delay_ms=delay))
+        self.assertEqual(settings.validate(dict(base,output_delay_ms=2000))['output_delay_ms'],2000)
+
     def test_roundtrip_and_invalid_input(self):
         with tempfile.TemporaryDirectory() as folder, patch.object(settings, 'CONFIG', Path(folder)/'settings.json'):
             value = dict(name='PC AirPlay', interface='{test-guid}', diagnostics=True)
             settings.save(value)
-            self.assertEqual(settings.load(), value)
+            self.assertEqual(settings.load(), settings.validate(value))
             for bad in ('', '\nname', 'x'*64):
                 with self.assertRaises(ValueError): settings.validate(dict(value, name=bad))
-            self.assertEqual(settings.load(), value)
+            self.assertEqual(settings.load(), settings.validate(value))
 
     def test_startup_off_does_not_delete_foreign_registration(self):
         with patch('winreg.CreateKey') as key, patch('winreg.QueryValueEx', return_value=('unrelated-command', 1)), patch('winreg.DeleteValue') as delete:

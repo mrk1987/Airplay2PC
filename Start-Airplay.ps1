@@ -3,7 +3,8 @@ param(
     [string]$Name = 'PC AirPlay',
     [switch]$ListInterfaces,
     [switch]$DebugLogging,
-    [switch]$TimingDiagnostics
+    [switch]$TimingDiagnostics,
+    [ValidateRange(0,2000)][int]$OutputDelayMs = 0
 )
 $ErrorActionPreference = 'Stop'
 $python = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
@@ -11,12 +12,16 @@ if (-not (Test-Path -LiteralPath $python)) { throw 'Create .venv with Python 3.1
 $receiver = Join-Path $PSScriptRoot 'vendor/airplay2-receiver/ap2-receiver.py'
 $previousPythonPath = $env:PYTHONPATH
 $previousTimingLog = $env:AIRPLAY_TIMING_LOG_DIR
+$previousOutputDelay = $env:AIRPLAY2PC_OUTPUT_DELAY_MS
 $runtime = Join-Path $PSScriptRoot 'runtime'
 New-Item -ItemType Directory -Force -Path $runtime | Out-Null
 Push-Location $runtime
 try {
-    if ($TimingDiagnostics) {
+    $env:AIRPLAY2PC_OUTPUT_DELAY_MS = [string]$OutputDelayMs
+    if ($TimingDiagnostics -or $OutputDelayMs -gt 0) {
         $env:PYTHONPATH = if ($previousPythonPath) { $PSScriptRoot + [IO.Path]::PathSeparator + $previousPythonPath } else { $PSScriptRoot }
+    }
+    if ($TimingDiagnostics) {
         $env:AIRPLAY_TIMING_LOG_DIR = Join-Path $PSScriptRoot 'runtime/timing'
         & $python -c 'from timing.clock import validate_clock; validate_clock()'
         if ($LASTEXITCODE -ne 0) { throw 'High-resolution timing clock validation failed.' }
@@ -35,4 +40,5 @@ try {
     Pop-Location
     $env:PYTHONPATH = $previousPythonPath
     $env:AIRPLAY_TIMING_LOG_DIR = $previousTimingLog
+    $env:AIRPLAY2PC_OUTPUT_DELAY_MS = $previousOutputDelay
 }

@@ -34,6 +34,7 @@
 !timing/diagnostics.py
 !timing/output_clock.py
 !timing/clock.py
+!timing/output_delay.py
 !docs/timing-research/
 !docs/timing-research/*.md
 !.gitattributes

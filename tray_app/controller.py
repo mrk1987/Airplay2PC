@@ -83,6 +83,7 @@ class Controller:
                 env['AIRPLAY2PC_READY_EVENT'] = event_name+'-ready'
                 env['PYTHONPATH'] = str(self.root)
                 env.pop('AIRPLAY_TIMING_LOG_DIR', None)
+                env['AIRPLAY2PC_OUTPUT_DELAY_MS'] = str(settings['output_delay_ms'])
                 if settings['diagnostics']:
                     env['AIRPLAY_TIMING_LOG_DIR'] = str(runtime/'timing')
                 args = [str(self.root/'.venv/Scripts/python.exe'), '-u', str(self.root/'tray_app/runner.py'),
