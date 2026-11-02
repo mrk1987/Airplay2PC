@@ -47,4 +47,4 @@ The upstream receiver has no licence file and is downloaded separately during
 setup. Third-party code, patch context and trademarks aren't covered by
 my licence. See [Third-party notes](docs/THIRD_PARTY.md).
 
-This is an independent project, not an Apple or Spotify product.
+This is an independent project, not an Apple.
