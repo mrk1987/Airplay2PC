@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 - 2026-11-02
+
+- Start the receiver automatically when opening the app.
+- Open Settings when no LAN interface is selected, then start after saving.
+- Migrate the old development shortcut and refresh its Airplay2PC logo.
+- Group setup scripts and dependencies under `packaging/`, and supporting documents under `docs/`.
+- Remove internal workspace and session notes from the public documentation.
+
 ## 0.1.0 - 2026-11-02
 
 First public release.

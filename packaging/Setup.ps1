@@ -29,10 +29,10 @@ try {
         $unexpected = @(Get-ChildItem -LiteralPath $installRoot -Force | Where-Object Name -ne 'runtime')
         if ($unexpected.Count) { throw 'The destination is not empty. Quit and uninstall the previous version first, or choose another directory.' }
     }
-    Write-Host 'Airplay2PC 0.1 setup'
+    Write-Host 'Airplay2PC setup'
     Write-Host "Destination: $installRoot"
     Write-Host 'Setup downloads Python, dependencies and the experimental upstream receiver.'
-    Write-Host 'The upstream receiver has no licence file; see THIRD_PARTY.md for details.'
+    Write-Host 'The upstream receiver has no licence file; see docs/THIRD_PARTY.md for details.'
     New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
     $work = Join-Path $installRoot '.setup'
     New-Item -ItemType Directory -Force -Path $work | Out-Null
@@ -56,7 +56,7 @@ try {
     Invoke-Checked $uv @('venv', '--python', '3.12.12', (Join-Path $installRoot '.venv'))
     $python = Join-Path $installRoot '.venv\Scripts\python.exe'
     Write-Host 'Installing the pinned Python packages...'
-    Invoke-Checked $uv @('pip', 'install', '--python', $python, '--require-hashes', '--only-binary', 'netifaces', '--find-links', (Join-Path $installRoot 'wheels'), '-r', (Join-Path $installRoot 'requirements-release.txt'))
+    Invoke-Checked $uv @('pip', 'install', '--python', $python, '--require-hashes', '--only-binary', 'netifaces', '--find-links', (Join-Path $installRoot 'wheels'), '-r', (Join-Path $installRoot 'packaging\requirements-release.txt'))
 
     Write-Host 'Downloading the pinned upstream receiver...'
     Get-Verified 'https://codeload.github.com/openairplay/airplay2-receiver/zip/6c343d3679ddb561c61566985acaaf587d0a3bd3' (Join-Path $work 'receiver.zip') 'b35d21ef303bcc7788cfcbb57e3df7fec12566d39601ed3471b94e73b4953a1c'
@@ -72,30 +72,10 @@ try {
         (Join-Path $installRoot 'patches\network-discovery.patch'))
     Invoke-Checked $python @((Join-Path $installRoot 'packaging\check_install.py'))
 
-    if (-not $NoShortcut) {
-        & (Join-Path $installRoot 'Install-Tray.ps1')
-        $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Airplay2PC'
-        New-Item -Path $key -Force | Out-Null
-        New-ItemProperty -Path $key -Name DisplayName -Value 'Airplay2PC' -Force | Out-Null
-        New-ItemProperty -Path $key -Name DisplayVersion -Value $manifest.version -Force | Out-Null
-        New-ItemProperty -Path $key -Name Publisher -Value 'mrk1987' -Force | Out-Null
-        New-ItemProperty -Path $key -Name InstallLocation -Value $installRoot -Force | Out-Null
-        New-ItemProperty -Path $key -Name DisplayIcon -Value (Join-Path $installRoot 'assets\icons\Airplay2PC-logo.ico') -Force | Out-Null
-        $uninstall = 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' + (Join-Path $installRoot 'packaging\Uninstall.ps1') + '"'
-        New-ItemProperty -Path $key -Name UninstallString -Value $uninstall -Force | Out-Null
-        New-ItemProperty -Path $key -Name NoModify -Value 1 -PropertyType DWord -Force | Out-Null
-        New-ItemProperty -Path $key -Name NoRepair -Value 1 -PropertyType DWord -Force | Out-Null
-    }
-    @{version=$manifest.version; root=$installRoot} | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $installRoot 'installation.json') -Encoding UTF8
-    $checkedWork = [IO.Path]::GetFullPath($work)
-    if ((Split-Path $checkedWork -Parent) -ne $installRoot -or (Split-Path $checkedWork -Leaf) -ne '.setup' -or
-        ((Get-Item -LiteralPath $checkedWork).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
-        throw 'Setup cleanup path validation failed.'
-    }
-    Remove-Item -LiteralPath $checkedWork -Recurse -Force
-    Write-Host 'Installed. Choose your LAN interface in Settings, then Start.'
+    & (Join-Path $installRoot 'packaging/Complete-Install.ps1') -InstallDirectory $installRoot -Version $manifest.version -NoShortcut:$NoShortcut
+    Write-Host 'Installed. Launching the app starts the receiver. Choose a LAN interface in Settings if asked.'
     Write-Host 'Allow Python on your private network if Windows asks about the firewall.'
-    if (-not $NoLaunch) { & (Join-Path $installRoot 'Start-Tray.ps1') -Settings }
+    if (-not $NoLaunch) { & (Join-Path $installRoot 'packaging\Start-Tray.ps1') -Settings }
     exit 0
 } catch {
     Write-Host "Setup failed: $($_.Exception.Message)" -ForegroundColor Red

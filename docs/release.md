@@ -6,7 +6,7 @@ It downloads a private Python 3.12 runtime, hash-locked packages and the pinned
 upstream receiver. Python and Git don't need to be installed beforehand.
 
 The receiver is fetched at setup time because its upstream revision has no
-licence file. It isn't bundled in the EXE. See [Third-party notes](../THIRD_PARTY.md).
+licence file. It isn't bundled in the EXE. See [Third-party notes](THIRD_PARTY.md).
 
 The installer is unsigned. Windows may show an unknown-publisher warning.
 Check the download against `SHA256SUMS.txt` before running it.
@@ -17,10 +17,10 @@ Use Python 3.12 and a C compiler to build netifaces, then build the package:
 
 ```powershell
 python -m pip wheel --no-deps netifaces==0.11.0 --wheel-dir wheelhouse
-python packaging/build_release.py --netifaces-wheel wheelhouse/netifaces-0.11.0-cp312-cp312-win_amd64.whl --output dist/0.1.0
+python packaging/build_release.py --netifaces-wheel wheelhouse/netifaces-0.11.0-cp312-cp312-win_amd64.whl --output dist/0.1.1
 ```
 
-The wheel's SHA-256 must appear in `requirements-release.txt`. If you rebuilt
+The wheel's SHA-256 must appear in `packaging/requirements-release.txt`. If you rebuilt
 the wheel, add its hash to the netifaces entry after checking its contents and
 licence. The build refuses an unrecognised wheel. Windows wheel builds can
 have different hashes because compiler output isn't reproducible yet.
@@ -35,7 +35,7 @@ checksums.
 
 ## Check before publishing
 
-Run `Test-Airplay.ps1`. Check the PowerShell scripts parse without errors.
+Run `packaging/Test-Airplay.ps1`. Check the PowerShell scripts parse without errors.
 Install into an empty directory with a space in its name, using
 `installer-input/Setup.ps1 -InstallDirectory PATH -NoShortcut -NoLaunch`.
 This downloads dependencies without starting the receiver or modifying the

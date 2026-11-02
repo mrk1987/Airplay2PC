@@ -21,7 +21,7 @@ git -C vendor/airplay2-receiver apply ../../patches/output-delay.patch
 git -C vendor/airplay2-receiver apply --check ../../patches/network-discovery.patch
 git -C vendor/airplay2-receiver apply ../../patches/network-discovery.patch
 uv venv --python 3.12 .venv
-uv pip install --python .venv/Scripts/python.exe -r requirements-windows.txt
+uv pip install --python .venv/Scripts/python.exe -r packaging/requirements-windows.txt
 ```
 
 The manual setup may need C/C++ build tools for netifaces. The release installer
@@ -32,7 +32,7 @@ includes a Windows wheel for it. Apply the patches once, in the order shown.
 Run from the project root. These tests do not open audio hardware or use the network:
 
 ```powershell
-.\Test-Airplay.ps1
+.\packaging\Test-Airplay.ps1
 ```
 
 The launcher and tests resolve `vendor/airplay2-receiver/` and `.venv/` from the
@@ -66,11 +66,3 @@ Add `-TimingDiagnostics` to the normal launcher command to record numeric anchor
 under ignored `runtime/timing/anchors-<pid>.jsonl`. This does not enable synced
 playback or record media, keys or complete protocol payloads. Files stop growing
 at roughly 5 MB per process. The launcher restores its environment variables on exit.
-
-## Local workspace
-
-The upstream checkout lives in `vendor/`, pairing data and logs in `runtime/`,
-and old captures in `archive/audio-captures/`. When I reorganised the workspace,
-I checked that the pairing file hashes hadn't changed and recreated `.venv/`
-from the pinned requirements. Old environments stay in `archive/environments/`
-for reference; don't activate them.

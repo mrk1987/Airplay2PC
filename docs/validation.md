@@ -6,6 +6,11 @@ That doesn't establish an end-to-end lossless path or a measured sync tolerance.
 
 ## Release 0.1 checks
 
+Version 0.1.1 adds tests for automatic startup, first-run interface selection,
+development-shortcut migration and preservation of unrelated shortcuts.
+All 70 tests pass. The installer and launch scripts use the grouped
+`packaging/` layout.
+
 The online installer completed in an empty directory with spaces in its path.
 Its private Python 3.12.12 runtime loaded Tcl/Tk and all native dependencies.
 The installed copy passed its 59 regression tests with zeroconf 0.149.16.

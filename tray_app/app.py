@@ -22,7 +22,7 @@ from tray_app.windows import InstanceLock, NamedEvent, set_app_identity
 
 
 class App:
-    def __init__(self, *, show_settings=False, autostart=False, events=None):
+    def __init__(self, *, show_settings=False, autostart=True, events=None):
         set_app_identity()  # before Tk creates any HWNDs: separate taskbar identity from Python
         self.events = events or {}
         self.root = tk.Tk()
@@ -48,10 +48,19 @@ class App:
                                 'Airplay2PC — Stopped', self.menu())
         threading.Thread(target=self.icon.run, daemon=True).start()
         self.root.after(200, self.tick)
-        if show_settings:
+        self.schedule_startup(show_settings=show_settings, autostart=autostart)
+
+    def schedule_startup(self, *, show_settings, autostart):
+        self.start_when_configured = autostart and not self.config['interface']
+        if show_settings or self.start_when_configured:
             self.root.after(300, self.settings_dialog)
-        elif autostart:
+        if autostart and self.config['interface']:
             self.root.after(400, lambda: self.run_operation('start'))
+
+    def start_after_settings(self):
+        if self.start_when_configured and self.config['interface']:
+            self.start_when_configured = False
+            self.run_operation('start')
 
     def enqueue(self, action):
         return lambda *_: self.actions.put(action)
@@ -211,6 +220,7 @@ class App:
             dialog.destroy()
             self.dialog = None
             self.icon.update_menu()
+            self.start_after_settings()
         ttk.Button(buttons, text='Cancel', command=dialog.destroy).pack(side='left', padx=(0,8))
         ttk.Button(buttons, text='Save', command=apply).pack(side='left')
         dialog.bind('<Return>', lambda _: apply())
@@ -234,12 +244,18 @@ class App:
                 pass
 
 
-def main():
+def parse_launch_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--settings', action='store_true')
-    parser.add_argument('--autostart', action='store_true')
+    parser.add_argument('--autostart', action='store_true', default=True)
+    parser.add_argument('--no-autostart', action='store_false', dest='autostart',
+                        help='Open the tray without starting the receiver')
     parser.add_argument('--action', choices=('start','stop','restart','quit','settings'))
-    args = parser.parse_args()
+    return parser.parse_args(argv)
+
+
+def main():
+    args = parse_launch_args()
     runtime = ROOT/'runtime'
     runtime.mkdir(exist_ok=True)
     handler = RotatingFileHandler(runtime/'tray.log', maxBytes=1_000_000, backupCount=2, encoding='utf-8')

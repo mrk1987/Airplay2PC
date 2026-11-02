@@ -22,7 +22,6 @@ See [Validation](validation.md) for acceptance targets and test commands.
 | Windows audio | Existing PyAudio sink, correctly sized s16 PCM | Whole AVFrame planes contain allocation padding. |
 | Timing research | Virtual PTP clock + DAC-aware playback if group tests fail | System-clock modification is unnecessary and intrusive. |
 | Reference implementation | goplay2 feature/audio-sync; Shairport Sync/NQPTP | goplay2 main has incomplete timing; README clock accuracy is not proof of audio accuracy. |
-| WSL/Cygwin | Deferred | Prior notes report WSL2 firmware blocker. Shairport Cygwin docs explicitly exclude AirPlay 2. |
 | Commercial software | Unverified | AirServer Connect hardware supports multiroom; that does not establish Windows Desktop support. |
 
 ## If acoustic validation fails
@@ -34,23 +33,3 @@ the Windows system clock is unnecessary.
 
 I'm keeping the working buffering and pacing unless a listening test or
 measurement shows a problem worth fixing.
-
-## Alternatives examined on 2026-11-02
-
-No drop-in native Windows alternative was verified during the investigation.
-The comparisons below are historical findings, not newly checked support claims.
-
-- https://github.com/openairplay/airplay2-receiver — accurate audio sync explicitly missing.
-- https://github.com/openairplay/goplay2 — Windows excluded; buffered AAC only.
-- https://raw.githubusercontent.com/openairplay/goplay2/feature/audio-sync/audio/player.go
-- https://raw.githubusercontent.com/openairplay/goplay2/feature/audio-sync/audio/clock.go
-- https://github.com/mikebrady/shairport-sync/blob/master/CYGWIN.md — AirPlay 2 unsupported.
-- https://github.com/mikebrady/nqptp — Linux/FreeBSD PTP timing companion.
-- https://www.airserver.com/WindowsDesktop — Windows multiroom support not established.
-
-
-## Scope
-
-I'm keeping this native to Windows. WSL2 wasn't a working option on the test
-machine because firmware virtualisation was disabled. The current setup needs
-no purchases or machine-wide installation. Pairings and recordings stay local.

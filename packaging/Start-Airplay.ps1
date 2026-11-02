@@ -7,22 +7,23 @@ param(
     [ValidateRange(0,2000)][int]$OutputDelayMs = 0
 )
 $ErrorActionPreference = 'Stop'
-$python = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
+$projectRoot = Split-Path -Parent $PSScriptRoot
+$python = Join-Path $projectRoot '.venv/Scripts/python.exe'
 if (-not (Test-Path -LiteralPath $python)) { throw 'Create .venv with Python 3.12 and install requirements-windows.txt first.' }
-$receiver = Join-Path $PSScriptRoot 'vendor/airplay2-receiver/ap2-receiver.py'
+$receiver = Join-Path $projectRoot 'vendor/airplay2-receiver/ap2-receiver.py'
 $previousPythonPath = $env:PYTHONPATH
 $previousTimingLog = $env:AIRPLAY_TIMING_LOG_DIR
 $previousOutputDelay = $env:AIRPLAY2PC_OUTPUT_DELAY_MS
-$runtime = Join-Path $PSScriptRoot 'runtime'
+$runtime = Join-Path $projectRoot 'runtime'
 New-Item -ItemType Directory -Force -Path $runtime | Out-Null
 Push-Location $runtime
 try {
     $env:AIRPLAY2PC_OUTPUT_DELAY_MS = [string]$OutputDelayMs
     if ($TimingDiagnostics -or $OutputDelayMs -gt 0) {
-        $env:PYTHONPATH = if ($previousPythonPath) { $PSScriptRoot + [IO.Path]::PathSeparator + $previousPythonPath } else { $PSScriptRoot }
+        $env:PYTHONPATH = if ($previousPythonPath) { $projectRoot + [IO.Path]::PathSeparator + $previousPythonPath } else { $projectRoot }
     }
     if ($TimingDiagnostics) {
-        $env:AIRPLAY_TIMING_LOG_DIR = Join-Path $PSScriptRoot 'runtime/timing'
+        $env:AIRPLAY_TIMING_LOG_DIR = Join-Path $projectRoot 'runtime/timing'
         & $python -c 'from timing.clock import validate_clock; validate_clock()'
         if ($LASTEXITCODE -ne 0) { throw 'High-resolution timing clock validation failed.' }
     }

@@ -11,4 +11,4 @@ The original PNG files are kept unchanged.
 
 The previous third-party AirPlay icons are no longer used. Historical copies
 are excluded from this project's MIT licence. Product trademarks retain their
-owners' rights; see `THIRD_PARTY.md` at the repository root.
+owners' rights; see `docs/THIRD_PARTY.md`.

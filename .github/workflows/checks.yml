@@ -19,7 +19,7 @@ jobs:
         shell: pwsh
         run: |
           python -m venv .venv
-          .venv/Scripts/python.exe -m pip install -r requirements-tray.txt
+          .venv/Scripts/python.exe -m pip install -r packaging/requirements-tray.txt
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Fetch and patch pinned receiver
         shell: pwsh
@@ -32,7 +32,7 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Run regressions
         shell: pwsh
-        run: ./Test-Airplay.ps1
+        run: ./packaging/Test-Airplay.ps1
       - name: Parse setup scripts
         shell: pwsh
         run: |

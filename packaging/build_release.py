@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 import zipfile
@@ -17,10 +18,11 @@ def digest(path):
 def sources():
     tracked = subprocess.check_output(['git', '-c', f'safe.directory={ROOT.as_posix()}',
                                        '-C', str(ROOT), 'ls-files', '-z']).decode().split('\0')
-    roots = {'README.md', 'LICENSE', 'THIRD_PARTY.md', 'CHANGELOG.md', 'SECURITY.md',
-             'VERSION', 'requirements-tray.txt', 'requirements-windows.txt', 'requirements-release.txt',
-             'Install-Tray.ps1', 'Start-Tray.ps1', 'Start-Airplay.ps1', 'Test-Airplay.ps1',
-             '.gitignore', '.gitattributes'}
+    roots = {'README.md', 'LICENSE', '.gitignore', '.gitattributes'}
+    required = roots | {'docs/THIRD_PARTY.md', 'docs/CHANGELOG.md', 'docs/SECURITY.md',
+        'packaging/VERSION', 'packaging/requirements-tray.txt', 'packaging/requirements-windows.txt',
+        'packaging/requirements-release.txt', 'packaging/Install-Tray.ps1',
+        'packaging/Start-Tray.ps1', 'packaging/Start-Airplay.ps1', 'packaging/Test-Airplay.ps1'}
     folders = {'assets', 'docs', 'packaging', 'patches', 'tests', 'timing', 'tools', 'tray_app', '.github'}
     result = []
     for name in filter(None, tracked):
@@ -35,7 +37,7 @@ def sources():
         if source.is_symlink() or not source.is_file():
             raise ValueError(f'Release input is not a regular file: {name}')
         result.append(name)
-    for name in roots:
+    for name in required:
         if name not in result:
             raise ValueError(f'Required release input is not tracked: {name}')
     return sorted(result)
@@ -51,9 +53,9 @@ def write_zip(destination, entries):
 
 
 def build(wheel, output, compile_installer=True):
-    version = (ROOT / 'VERSION').read_text().strip()
-    if version != '0.1.0':
-        raise ValueError('Review the release metadata before changing version')
+    version = (ROOT / 'packaging/VERSION').read_text().strip()
+    if not re.fullmatch(r'(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)', version):
+        raise ValueError('Expected a numeric major.minor.patch version')
     wheel = Path(wheel).resolve()
     if wheel.name != 'netifaces-0.11.0-cp312-cp312-win_amd64.whl':
         raise ValueError('Expected the netifaces 0.11.0 CPython 3.12 x64 wheel')
@@ -64,7 +66,7 @@ def build(wheel, output, compile_installer=True):
         licence = archive.read(licence_names[0])
         if b'Alastair Houghton' not in licence or b'Permission is hereby granted' not in licence:
             raise ValueError('Unexpected netifaces licence')
-    lock = (ROOT / 'requirements-release.txt').read_text()
+    lock = (ROOT / 'packaging/requirements-release.txt').read_text()
     if digest(wheel) not in lock:
         raise ValueError('The wheel hash must appear in requirements-release.txt')
     output = Path(output).resolve()
@@ -93,9 +95,9 @@ def build(wheel, output, compile_installer=True):
         '[Version]', 'Class=IEXPRESS', 'SEDVersion=3', '[Options]',
         'PackagePurpose=InstallApp', 'ShowInstallProgramWindow=1', 'HideExtractAnimation=0',
         'UseLongFileName=1', 'InsideCompressed=0', 'CAB_FixedSize=0', 'CAB_ResvCodeSigning=0',
-        'RebootMode=N', 'InstallPrompt=Install Airplay2PC 0.1.0? An internet connection is required.',
+        'RebootMode=N', f'InstallPrompt=Install Airplay2PC {version}? An internet connection is required.',
         'DisplayLicense=', 'FinishMessage=', f'TargetName={exe}',
-        'FriendlyName=Airplay2PC 0.1.0', 'AppLaunched=cmd.exe /c Setup.cmd',
+        f'FriendlyName=Airplay2PC {version}', 'AppLaunched=cmd.exe /c Setup.cmd',
         'PostInstallCmd=<None>', 'AdminQuietInstCmd=', 'UserQuietInstCmd=',
         'SourceFiles=SourceFiles', '[SourceFiles]', f'SourceFiles0={package}\\',
         '[SourceFiles0]', *[f'%FILE{i}%=' for i in range(len(names))],

@@ -7,10 +7,8 @@ It sounds in sync in my setup; I haven't measured the acoustic alignment.
 ## Implemented
 
 The experimental pipeline uses `perf_counter_ns()` / QueryPerformanceCounter.
-On this Python 3.12 Windows host, `monotonic_ns()` was verified to use
-GetTickCount64 with 15.625 ms resolution; it must not be used or mixed into new
-timing records. QPC reports 100 ns resolution. Capture files identify their clock;
-replay refuses clock fitting on untagged or incompatible records.
+Capture files identify their clock, and replay rejects incompatible clock domains.
+Do not mix these records with `monotonic_ns()` timestamps.
 
 | Module | Responsibility |
 |---|---|
@@ -28,22 +26,13 @@ fit residual and full-horizon rate-error allowance. It does not measure path del
 elect a master, implement peer awakening or prove Windows receive timestamp quality.
 Reacquisition resets the generation so old anchors cannot be reused silently.
 
-## Evidence
+## Tests
 
-41 offline tests pass, including synthetic 30-minute clock/drift scenarios, packet
-reordering/duplication, sequence rollover, correction arithmetic, malformed frames,
-clock steps/expiry, pause/reanchor behavior, diagnostic redaction and replay.
-Simulation uses declared delay/rate bounds; it is not a real 30-minute listening test.
-The initial two patches reproduced the three modified upstream files (allowing
-CRLF/LF differences). The 0.1 release adds fixed-delay and discovery-cleanup patches.
-
-Review found overflow, forward-step lifecycle and high-rate-window bugs.
-They're fixed and covered by regression tests. See the research ledger.
-
-A silent 20-second probe tonight captured no PTP packets: inconclusive, not a
-regression of earlier active-group reachability. Read-only device enumeration showed
-MME as the default host API with reported 90/180 ms low/high latency; WASAPI is available.
-These latency values are metadata, not measured DAC or acoustic delay. No stream opened.
+The tests cover synthetic clock drift, packet reordering and duplication,
+sequence rollover, correction arithmetic, malformed frames, clock steps,
+expiry, pause/reanchor behaviour, diagnostic redaction and replay.
+Synthetic scenarios use declared delay and rate bounds; they don't establish
+real acoustic alignment or DAC timing accuracy.
 
 ## Next tests
 
@@ -56,4 +45,9 @@ These latency values are metadata, not measured DAC or acoustic delay. No stream
    outside the real-time callback. The current drift policy returns decisions only.
 5. Gate opt-in synced output on valid clocks/anchors, then validate acoustically.
 
-The source list and design trade-offs are in [research notes](timing-research/DESIGN.md).
+## References
+
+- [Shairport Sync RTP handling](https://github.com/mikebrady/shairport-sync/blob/master/rtp.c)
+- [Shairport Sync RTSP handling](https://github.com/mikebrady/shairport-sync/blob/master/rtsp.c)
+- [NQPTP message handling](https://github.com/mikebrady/nqptp/blob/main/nqptp-message-handlers.c)
+- [PortAudio callback timing](https://portaudio.com/docs/v19-doxydocs/structPaStreamCallbackTimeInfo.html)

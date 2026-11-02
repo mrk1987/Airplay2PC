@@ -11,13 +11,15 @@ handles setup and opens Settings. For a development checkout, first follow
 [Setup](setup.md), then run:
 
 ```powershell
-uv pip install --python .venv/Scripts/python.exe -r requirements-tray.txt
-.\Install-Tray.ps1
-.\Start-Tray.ps1
+uv pip install --python .venv/Scripts/python.exe -r packaging/requirements-tray.txt
+.\packaging\Install-Tray.ps1
+.\packaging\Start-Tray.ps1
 ```
 
-The installer creates a per-user Start menu shortcut. The tray opens stopped.
-Double-click its icon (or launch it again) to open Settings. Right-click for controls.
+The installer creates a per-user Start menu shortcut with the Airplay2PC logo.
+Launching the app starts the receiver automatically. If a LAN interface is
+missing, Settings opens first; saving an interface starts the receiver.
+Double-click the tray icon (or launch it again) to open Settings. Right-click for controls.
 Settings preselects a private IPv4 interface only if there is exactly one candidate;
 otherwise choose the physical LAN explicitly. Name, interface and diagnostics are
 stored locally in ignored `runtime/tray-settings.json`.
@@ -64,7 +66,7 @@ psutil, so generic TCP status alone is not used as readiness evidence.
 
 ## Checks and limitations
 
-Run `.\Test-Airplay.ps1` after installing the tray requirements. Tests cover real
+Run `.\packaging\Test-Airplay.ps1` after installing the tray requirements. Tests cover real
 Job Object cleanup, suspended-start failure, unrelated-process isolation, duplicate
 mutexes, cooperative shutdown and settings validation. Actual receiver Start,
 Restart and Stop were also checked without sending audio.
@@ -77,3 +79,6 @@ For an installed release, quit the tray and remove Airplay2PC through Windows'
 installed-apps list. Pairings, settings and logs stay in `runtime/`.
 For a development checkout, quit the tray, disable Start at login in Settings,
 then remove its Start menu shortcut.
+
+For troubleshooting, `pythonw.exe tray_app/app.py --no-autostart` opens the
+tray without starting the receiver. Start at login remains opt-in.
